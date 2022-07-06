@@ -1,22 +1,43 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Light from "./Light.jsx";
+import { colors } from "../colors.js";
+import CycleButton from "./CycleButton.jsx";
 
 const TrafficLight = () => {
+  //State initialization
+  const [selected, setSelected] = useState("");
+  const [clicked, setClicked] = useState(-1);
 
-const [selected, setSelected] = useState("")
-const handleClick = (e)=> {
-    setSelected(e.target.id)
-}
+  //Pass ID onClick
+  const handleClick = (e) => setSelected(e.target.id);
+
+  //Create array of colors from colors file
+  const colorsArr = colors.map((item) => item.color);
+
+  //Change the value of selected to a value in the colors array when click is changed
+  useEffect(() => {
+    setSelected(colorsArr[clicked]);
+  }, [clicked]);
+
+  //Repeatedly click button
+  const cycleHandler = () => clicked === colorsArr.length-1 ? setClicked(0) : setClicked(() => clicked + 1);
 
   return (
     <>
-    <div>selected: {selected}</div>
-    <div className="traffic-light-BG d-flex flex-column">
-      <Light handleClick={handleClick} id="red" color="red" isSelected={selected === "red" ? "is-selected" : ""}></Light>
-      <Light handleClick={handleClick} id="yellow" color="yellow" isSelected={selected === "yellow" ? "is-selected" : ""}></Light>
-      <Light handleClick={handleClick} id="green" color="green" isSelected={selected === "green" ? "is-selected" : ""}></Light>
-    </div>
+      <div>selected: {selected}</div>
+      <div className="traffic-light-BG d-flex flex-column">
+        {colors.map((item, index) => (
+          <Light
+            key={index}
+            handleClick={handleClick}
+            id={item.color}
+            color={item.color}
+            isSelected={selected === item.color ? "is-selected" : ""}
+          />
+        ))}
+      </div>
+      <CycleButton handleClick={cycleHandler} name="Cycle Light" />
     </>
   );
 };
